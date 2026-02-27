@@ -101,8 +101,12 @@ curl -fSL --progress-bar "$ASSET_URL" -o "${TMPDIR_WORK}/${ASSET_NAME}"
 info "Extracting…"
 tar -xzf "${TMPDIR_WORK}/${ASSET_NAME}" -C "$TMPDIR_WORK"
 
-# Find the paqet binary inside the archive
-NEW_BINARY="$(find "$TMPDIR_WORK" -type f -name "paqet" ! -name "*.tar.gz" | head -1)"
+# Find the paqet binary inside the archive.
+# The binary may be named "paqet", "paqet_linux_amd64", etc. — match anything
+# starting with "paqet" that is not an archive, README, or example file.
+NEW_BINARY="$(find "$TMPDIR_WORK" -type f -name "paqet*" \
+  ! -name "*.tar.gz" ! -name "*.zip" ! -name "*.md" ! -name "*.yaml" ! -name "*.yml" \
+  | head -1)"
 [[ -z "$NEW_BINARY" ]] && error "Could not find 'paqet' binary inside ${ASSET_NAME}"
 
 chmod +x "$NEW_BINARY"
